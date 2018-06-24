@@ -1,0 +1,134 @@
+package com.company;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class HotelReservation {
+
+    private final String hotelName;
+    private List<Room> rooms = new ArrayList<>();
+
+    static final Comparator<Room> price_order;
+
+    static  {
+        price_order = (room1, room2) -> {
+            if (room1.getPrice() < room2.getPrice()) {
+                return -1;
+            } else if (room1.getPrice() > room2.getPrice()) {
+                return 1;
+            }
+            return 0;
+        };
+    }
+
+    HotelReservation(String hotelName, int zoneNum, int roomNumber) {
+        this.hotelName = hotelName;
+        int lastZone = 'A' + (zoneNum - 1);
+        for (char zoneChar = 'A'; zoneChar < lastZone; zoneChar++) {
+            for (int roomNum = 1; roomNum <= roomNumber; roomNum++) {
+                double price = 15.99;
+                if (zoneChar < 'D') {
+                    price = 17.62;
+                } else if (zoneChar > 'F') {
+                    price = 13.35;
+                }
+                Room room = new Room(zoneChar + String.format("%02d", roomNum), price);
+                rooms.add(room);
+            }
+        }
+
+    }
+
+
+    boolean reserveRoom(String roomName) {
+        if (findingRoom(roomName) >= 0) {
+            return rooms.get(findingRoom(roomName)).getRoom();
+        }
+        System.out.println("Not found any room " + roomName + " for you.");
+        return false;
+    }
+
+    boolean cancelRoom(String roomName) {
+        if (findingRoom(roomName) >= 0) {
+            return rooms.get(findingRoom(roomName)).cancelRoom();
+        }
+        System.out.println("Not found any room " + roomName + " for you.");
+        return false;
+    }
+
+    private int findingRoom(String roomName) {
+        //Initialize var price = 0 for finding item
+        Room requestedRoom = new Room(roomName, 0);
+        // search requestedRoom by using binary search in rooms ordered by name.
+        int foundRoom = Collections.binarySearch(rooms, requestedRoom, null);
+        if (foundRoom >= 0) {
+            return foundRoom;
+        } else {
+            return -1;
+
+        }
+    }
+
+    List<Room> getRooms() {
+        return rooms;
+    }
+
+
+    public class Room implements Comparable<Room> {
+        private final String roomName;
+        private boolean reservedRoom = false;
+        private double price;
+
+        Room(String roomName, double price) {
+            this.roomName = roomName;
+            this.price = price;
+        }
+
+        // check if you are able to get room or not, return false otherwise.
+        private boolean getRoom() {
+            if (!this.reservedRoom) {
+                this.reservedRoom = true;
+                System.out.println("Reservation of room " + roomName + " is reserved.");
+                System.out.println("please pay ====> $" + this.price);
+                return true;
+            }
+            System.out.println("Reservation of room " + roomName + " is already reserved.");
+            return false;
+        }
+
+        private boolean cancelRoom() {
+            if (this.reservedRoom) {
+                this.reservedRoom = false;
+                System.out.println("Reservation of room " + roomName + " is cancelled.");
+                System.out.println("Return $" + this.price);
+                return true;
+            }
+            return false;
+        }
+
+        String checkRoomReserved() {
+            if (this.reservedRoom) {
+                return " ====> reserved";
+            }
+            return "";
+        }
+
+        @Override
+        public int compareTo(Room room) {
+            return this.roomName.compareToIgnoreCase(room.getRoomName());
+        }
+
+
+        String getRoomName() {
+            return roomName;
+        }
+
+        double getPrice() {
+            return price;
+        }
+    }
+
+
+}
