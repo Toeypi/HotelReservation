@@ -4,4 +4,4 @@ Build Hotel by input name, number of zone, number of rooms.
 function
  - able to reserve or cancel room.
  - show list by alphabeltic name order.
- - show list order by lower price to highest price.
+ - show list order by lowest price to highest price.
